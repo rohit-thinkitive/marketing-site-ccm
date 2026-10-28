@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+<head>
+<style>
+@font-face{font-family:'Inter';font-style:normal;font-weight:400 800;font-display:swap;src:url(../vendor/inter-latin-sub.woff2) format('woff2')}
+@font-face{font-family:'Manrope';font-style:normal;font-weight:200 800;font-display:swap;src:url(../vendor/manrope-latin.woff2) format('woff2')}
+</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>eCareMD — Patient Care Plan Overview</title>
+<link rel="stylesheet" href="../assets/app.css">
+<style>
+  .main{padding:16px 20px}
+
+  /* ===== Patient header card ===== */
+  .phead{display:flex;align-items:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 0;margin-bottom:10px}
+  .phead > .sec{display:flex;align-items:center;padding:0 10px;position:relative;flex:0 0 auto}
+  .phead > .sec + .sec::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:1px;background:var(--line)}
+  .p-av{width:46px;height:46px;border-radius:9px;background:#EEF1F4;display:grid;place-items:center;color:var(--ink-3);flex:0 0 46px;margin-right:10px}
+  .p-name{font-size:15px;font-weight:700;color:var(--ink);line-height:1.25;white-space:nowrap}
+  .p-meta{font-size:11.5px;color:var(--ink-3);margin-top:5px;font-weight:500;white-space:nowrap}
+
+  .p-links{display:flex;flex-direction:column;gap:10px}
+  .p-links a{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--ink-2);text-decoration:none;white-space:nowrap}
+  .p-links a svg{color:var(--ink-3);flex:0 0 auto}
+
+  .pill-row{display:flex;gap:7px}
+  .pill{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 11px;border-radius:7px;font-size:12.5px;font-weight:700;white-space:nowrap}
+  .pill.ccm{background:var(--teal);color:#fff}
+  .pill.rpm{background:#fff;border:1.4px solid var(--teal);color:var(--teal)}
+  .p-time{font-size:11px;color:var(--ink-3);margin-top:8px;font-weight:500;white-space:nowrap}
+
+  .act-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+  .act{width:32px;height:32px;border-radius:50%;border:1.4px solid var(--teal-border);display:grid;place-items:center;color:var(--teal)}
+
+  .info-box{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+  .info-col{padding:8px 9px;position:relative}
+  .info-col + .info-col::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:1px;background:var(--line)}
+  .info-lbl{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--ink);white-space:nowrap}
+  .info-lbl svg{color:var(--ink-3);flex:0 0 auto}
+  .info-val{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:11px;color:var(--ink-2);font-weight:500;white-space:nowrap}
+  .mini-av{width:22px;height:22px;border-radius:50%;background:var(--teal-soft);display:inline-grid;place-items:center;color:var(--teal);font-size:10px}
+  .mini-chip{display:inline-flex;align-items:center;padding:3px 7px;border-radius:5px;font-size:11px;font-weight:700;background:var(--teal-soft);color:var(--teal-strong)}
+  .mini-plus{display:inline-flex;align-items:center;padding:3px 6px;border-radius:5px;font-size:11px;font-weight:700;background:#EEF2F4;color:var(--ink-2)}
+
+  .timer{display:flex;align-items:center;gap:7px;margin-left:auto;margin-right:10px;border:1px solid var(--line);border-radius:10px;padding:6px 8px;flex:0 0 auto}
+  .timer .stop{width:15px;height:15px;border-radius:3px;background:var(--red);flex:0 0 15px}
+  .timer .clock{font-size:14px;font-weight:700;color:var(--ink);letter-spacing:.3px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .timer .tbtn{width:34px;height:34px;border-radius:8px;background:var(--teal);display:grid;place-items:center;color:#fff;flex:0 0 34px}
+
+  /* ===== note row ===== */
+  .note-row{display:flex;align-items:center;gap:10px;padding:2px 4px 12px;font-size:13.5px}
+  .note-row .add{display:flex;align-items:center;gap:6px;color:var(--teal);font-weight:600}
+  .note-row .na{color:var(--ink-3)}
+
+  /* ===== main tabs ===== */
+  .mtabs{display:flex;align-items:flex-end;gap:2px;background:#F2F5F7;border-radius:9px 9px 0 0;padding:0 4px}
+  .mtab{padding:11px 20px;font-size:14px;font-weight:600;color:var(--ink-3);white-space:nowrap;text-align:center;line-height:1.2}
+  .mtab.on{background:var(--teal);color:#fff;border-radius:9px 9px 0 0;padding:11px 18px}
+
+  /* ===== sub tabs ===== */
+  .stab-bar{display:flex;align-items:center;border-bottom:1px solid var(--line);padding:0 2px;margin-bottom:16px}
+  .stabs{display:flex;gap:28px}
+  .stab{padding:14px 0;font-size:14px;font-weight:600;color:var(--ink-2);position:relative}
+  .stab.on{color:var(--teal)}
+  .stab.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2.5px;background:var(--teal);border-radius:2px}
+  .stab-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+
+  /* ===== devices ===== */
+  .dev-lbl{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:8px}
+  .dev-dd{display:flex;align-items:center;width:100%;height:44px;padding:0 16px;border:1px solid #D7DDE2;border-radius:9px;font-size:14px;color:var(--ink);background:#fff;margin-bottom:18px}
+  .dev-dd .stack{margin-left:auto;display:flex;flex-direction:column;color:var(--ink-4);line-height:.5}
+
+  /* ===== two column ===== */
+  .cols{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;align-items:start}
+
+  .row-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .row-head .ttl{font-size:15px;font-weight:700;color:var(--ink)}
+  .row-head .btns{margin-left:auto;display:flex;gap:8px}
+  .sbtn{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 14px;border-radius:8px;font-size:13.5px;font-weight:600;white-space:nowrap}
+  .sbtn.out{background:#fff;border:1px solid #D7DDE2;color:var(--ink-2)}
+  .sbtn.teal{background:var(--teal);color:#fff}
+  .sbtn.dis{background:#F2F4F6;color:var(--ink-4);border:1px solid var(--line)}
+
+  .meta-strip{display:inline-block;background:#EEF1F4;border-radius:6px;padding:6px 12px;font-size:11.5px;font-weight:700;letter-spacing:.3px;color:var(--ink-2);margin-bottom:14px}
+
+  .ccard{background:#fff;border:1px solid var(--line);border-radius:11px;padding:16px 18px;margin-bottom:16px}
+  .ccard-h{display:flex;align-items:center}
+  .ccard-h .t{font-size:15px;font-weight:700;color:var(--ink)}
+  .ccard-h .chev{margin-left:auto;color:var(--ink-3)}
+  .clist{list-style:none;margin-top:12px}
+  .clist li{display:flex;align-items:flex-start;gap:11px;padding:5px 0;font-size:13.5px;color:var(--ink);line-height:1.5}
+  .clist li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ink);margin-top:8px;flex:0 0 6px}
+
+  /* right column */
+  .r-h{font-size:16px;font-weight:700;color:var(--ink)}
+  .r-sub{font-size:13px;color:var(--ink-2);margin-top:6px;margin-bottom:14px}
+  .ctrl-row{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+  .ctrl-dd{display:flex;align-items:center;gap:8px;height:42px;padding:0 12px;border:1px solid #D7DDE2;border-radius:9px;font-size:13px;color:var(--ink);background:#fff}
+  .ctrl-dd.grow{flex:1;min-width:0}
+  .ctrl-dd .stack{margin-left:auto;display:flex;flex-direction:column;color:var(--ink-4);line-height:.5}
+  .ctrl-dd .txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .toggle{width:34px;height:18px;border-radius:10px;background:#D7DDE2;position:relative;flex:0 0 34px}
+  .toggle::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff}
+  .tg-wrap{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-2);font-weight:500}
+  .doc-ic{width:40px;height:42px;border:1px solid #D7DDE2;border-radius:9px;display:grid;place-items:center;color:var(--ink-3);flex:0 0 40px}
+
+  .ucard{background:#fff;border:1px solid var(--line);border-radius:11px;margin-bottom:16px}
+  .ucard-h{display:flex;align-items:center;padding:14px 16px}
+  .ucard-h .t{font-size:14.5px;font-weight:700;color:var(--ink)}
+  .ucard-h .chev{color:var(--ink-3);margin-left:8px}
+  .ucard-h .btns{margin-left:auto;display:flex;gap:8px}
+  .ucard-body{min-height:120px}
+
+  /* floating support */
+  .fab{position:fixed;right:26px;bottom:24px;width:52px;height:52px;border-radius:50%;background:var(--teal);display:grid;place-items:center;color:#fff;box-shadow:0 6px 18px rgba(11,122,110,.35);z-index:20}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <nav class="snav">
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Dashboard</a>
+      <a class="on" href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Patients</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v16"/></svg>Billing &amp; Claims</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Call Scheduler</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9Z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>Alerts</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg>Communications</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 11 3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>Task</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 9h8M8 13h5"/></svg>Education</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2Z"/><path d="M8 3v18"/></svg>Library</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.9 1.09V21a2 2 0 1 1-4 0 1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 5 14.6a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4 1.65 1.65 0 0 0 1.51-1.08 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0 1.65 1.65 0 0 0 1.08 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4 1.65 1.65 0 0 0-1.51 1Z"/></svg>Settings</a>
+    </nav>
+    <div class="side-foot">
+      <div class="lbl">SUPPORT USER</div>
+      <div class="mail">support+TP@medarch.com</div>
+      <div class="logout"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>Logout</div>
+    </div>
+  </aside>
+
+  <!-- ===== CONTENT ===== -->
+  <div class="content">
+    <!-- HEADER -->
+    <header class="topbar">
+      <img class="logo" src="../ecaremd-logo.svg" alt="eCareMD">
+      <button class="collapse-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m11 17-5-5 5-5M18 17l-5-5 5-5"/></svg></button>
+      <nav class="topnav">
+        <a class="on" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a3 3 0 1 0-3-3M6 21v-2a4 4 0 0 1 4-4h1"/><circle cx="9" cy="7" r="3"/><path d="m14 14 2 2 4-4"/></svg>CCM</a>
+        <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg>RPM<svg class="chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></a>
+        <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a6 6 0 0 1 12 0v2"/></svg>PCM</a>
+        <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20v-1a5 5 0 0 1 10 0v1M14 20v-1a4 4 0 0 1 7-2.6"/></svg>TCM</a>
+        <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16"/></svg>ALL</a>
+      </nav>
+      <div class="topright">
+        <div class="icon-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M15 2v6M12 5h6"/><path d="M6.5 3A2.5 2.5 0 0 0 4 5.5C4 13 11 20 18.5 20A2.5 2.5 0 0 0 21 17.5v-2a1 1 0 0 0-.8-1l-3-.6a1 1 0 0 0-1 .4l-.8 1a12 12 0 0 1-5-5l1-.8a1 1 0 0 0 .4-1L11 4.3a1 1 0 0 0-1-.8Z"/></svg></div>
+        <div class="org-select">PrimeCare Physicians <span class="stack"><svg width="12" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 15 6-6 6 6"/></svg><svg width="12" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg></span></div>
+        <button class="btn-admin"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M17 3 21 7l-4 4M21 7H8M7 21l-4-4 4-4M3 17h13"/></svg>Switch to Admin</button>
+        <span class="hicon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+        <span class="hicon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9Z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg></span>
+        <button class="btn-new"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 11 0"/><path d="M18 8v6M15 11h6"/></svg>New Patients</button>
+      </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- Patient header card -->
+      <div class="phead">
+        <div class="sec">
+          <div class="p-av" style="padding:0;overflow:hidden;background:#EEF1F4"><img src="../vendor/adam-image.webp" alt="Cindy Russell" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+          <div>
+            <div class="p-name">Cindy Russell</div>
+            <div class="p-meta">39801 | MALE | 09-30-1949</div>
+          </div>
+        </div>
+        <div class="sec">
+          <div class="p-links">
+            <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg>Consent</a>
+            <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="8" r="3.2"/><path d="M4 20a6 6 0 0 1 12 0"/><path d="M18 8l3 3-3 3" opacity=".7"/></svg>Profile</a>
+          </div>
+        </div>
+        <div class="sec">
+          <div>
+            <div class="pill-row">
+              <span class="pill ccm"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5L20 6"/></svg>CCM</span>
+              <span class="pill rpm">RPM</span>
+            </div>
+            <div class="p-time">07/04/2026, 02:47:02 AM</div>
+          </div>
+        </div>
+        <div class="sec">
+          <div class="act-grid">
+            <span class="act"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            <span class="act"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg></span>
+            <span class="act"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12.8 12.8 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5 12.8 12.8 0 0 0 2.8.7 2 2 0 0 1 1.7 2Z"/></svg></span>
+            <span class="act"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m16 10 6-3v10l-6-3Z"/></svg></span>
+          </div>
+        </div>
+        <div class="sec" style="padding-right:16px">
+          <div class="info-box">
+            <div class="info-col">
+              <div class="info-lbl">Conditions <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></div>
+              <div class="info-val"><span class="mini-chip">ANXIE…</span><span class="mini-plus">+1</span></div>
+            </div>
+            <div class="info-col">
+              <div class="info-lbl">Care Team <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></div>
+              <div class="info-val"><span class="mini-av"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><span class="mini-av"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span></div>
+            </div>
+            <div class="info-col">
+              <div class="info-lbl">Last Interaction <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></div>
+              <div class="info-val">5 days ago</div>
+            </div>
+            <div class="info-col">
+              <div class="info-lbl">Log Time <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+              <div class="info-val">Goal: <b style="color:var(--ink);font-weight:700;margin-left:2px">3/20</b></div>
+            </div>
+          </div>
+        </div>
+        <div class="timer">
+          <span class="stop"></span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" stroke-width="1.8"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+          <span class="clock">00:00:08</span>
+          <span class="tbtn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="13" r="7"/><path d="M12 10v3l2 1M9 3h6"/></svg></span>
+        </div>
+      </div>
+
+      <!-- note row -->
+      <div class="note-row">
+        <span class="add"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Click to add a note</span>
+        <span class="na">No note available</span>
+      </div>
+
+      <!-- main tabs -->
+      <div class="mtabs">
+        <div class="mtab on">Care<br>Management</div>
+        <div class="mtab">Vitals</div>
+        <div class="mtab">Clinicals</div>
+        <div class="mtab">Assessment</div>
+        <div class="mtab">Alerts</div>
+        <div class="mtab">Tasks</div>
+        <div class="mtab">Documents</div>
+        <div class="mtab">Notes</div>
+        <div class="mtab">Communications</div>
+        <div class="mtab">Billing</div>
+        <div class="mtab">Education</div>
+        <div class="mtab">Transition</div>
+      </div>
+
+      <!-- sub tabs -->
+      <div class="stab-bar">
+        <div class="stabs">
+          <div class="stab on">Care Plan Overview</div>
+          <div class="stab">Care Plan Progress</div>
+          <div class="stab">Condition Questionnaire</div>
+          <div class="stab">Provider Review</div>
+          <div class="stab">Time Log</div>
+        </div>
+        <div class="stab-right">
+          <div class="pager"><span class="a"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></span><span class="m">July 2026</span><span class="a"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 18 6-6-6-6"/></svg></span></div>
+          <button class="btn btn-out-teal">Generate Report</button>
+        </div>
+      </div>
+
+      <!-- devices -->
+      <div class="dev-lbl">Devices</div>
+      <div class="dev-dd">All <span class="stack"><svg width="12" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 15 6-6 6 6"/></svg><svg width="12" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg></span></div>
+
+      <!-- two columns -->
+      <div class="cols">
+        <!-- LEFT -->
+        <div>
+          <div class="row-head">
+            <div class="ttl">Patient Centered Care Plan</div>
+            <div class="btns">
+              <button class="sbtn out">Collapse All <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m6 15 6-6 6 6"/></svg></button>
+              <button class="sbtn out">Stop</button>
+              <button class="sbtn dis">Update</button>
+              <button class="sbtn teal">New</button>
+            </div>
+          </div>
+          <div class="meta-strip">STARTED: 07/04/2026 | UPDATED:07/04/2026| BY:DAVID ROMERO</div>
+
+          <div class="ccard">
+            <div class="ccard-h"><span class="t">Goals Important to the Patient</span><span class="chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 15 6-6 6 6"/></svg></span></div>
+            <ul class="clist">
+              <li>Complete tasks in a timely manner</li>
+              <li>Establish a team of medical professionals, family, and friends to support me</li>
+              <li>Adhere to sodium restriction set by provider</li>
+              <li>Check and log blood pressure daily to bring to appointments</li>
+              <li>Exercise or be more physically active</li>
+              <li>Consumes less than 30 mg Table Salt per day</li>
+              <li>Maintain a blood pressure below 120/80</li>
+            </ul>
+          </div>
+
+          <div class="ccard">
+            <div class="ccard-h"><span class="t">Potential Barriers</span><span class="chev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 15 6-6 6 6"/></svg></span></div>
+            <ul class="clist">
+              <li>Current tobacco user</li>
+              <li>Difficulty managing symptoms</li>
+              <li>Diet adherence issues</li>
+              <li>Fatigue</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- RIGHT -->
+        <div>
+          <div class="r-h">Monthly Care Plan Update(s)</div>
+          <div class="r-sub">Select the default user and update date for new updates to be added on this page.</div>
+
+          <div class="ctrl-row">
+            <div class="ctrl-dd grow"><span class="txt">Support user (Care Mar</span><span class="stack"><svg width="12" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 15 6-6 6 6"/></svg><svg width="12" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg></span></div>
+            <div class="ctrl-dd grow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" stroke-width="1.7"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span class="txt">07/09/2026, 01:22 PM</span></div>
+            <div class="tg-wrap"><span class="toggle"></span>Note</div>
+            <div class="doc-ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg></div>
+            <div class="ctrl-dd"><span class="txt">Current Month</span><span class="stack"><svg width="12" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 15 6-6 6 6"/></svg><svg width="12" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg></span></div>
+          </div>
+
+          <div class="ucard">
+            <div class="ucard-h">
+              <span class="t">Updates about Monthly Goals: Notes/Summary</span>
+              <span class="chev"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 15 6-6 6 6"/></svg></span>
+              <div class="btns">
+                <button class="sbtn out">Manage</button>
+                <button class="sbtn out" style="color:var(--teal);border-color:var(--teal)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>Add Update</button>
+              </div>
+            </div>
+            <div class="ucard-body"></div>
+          </div>
+
+          <div class="ucard">
+            <div class="ucard-h">
+              <span class="t">Updates about Monthly Barriers: Notes/Summary</span>
+              <span class="chev"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 15 6-6 6 6"/></svg></span>
+              <div class="btns">
+                <button class="sbtn out">Manage</button>
+                <button class="sbtn out" style="color:var(--teal);border-color:var(--teal)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>Add Update</button>
+              </div>
+            </div>
+            <div class="ucard-body"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- floating support -->
+<div class="fab"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 14v-3a8 8 0 0 1 16 0v3"/><path d="M4 14a2 2 0 0 1 2-2h1v6H6a2 2 0 0 1-2-2ZM20 14a2 2 0 0 0-2-2h-1v6h1a2 2 0 0 0 2-2Z"/><path d="M18 18a4 4 0 0 1-4 3h-2"/></svg></div>
+
+<script>
+(function(){
+  /* ---- working timer ---- */
+  var clock=document.querySelector('.timer .clock');
+  var secs=8, running=true;
+  function fmt(s){var h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;
+    return (h<10?'0':'')+h+':'+(m<10?'0':'')+m+':'+(ss<10?'0':'')+ss;}
+  setInterval(function(){ if(running){ secs++; if(clock) clock.textContent=fmt(secs); } },1000);
+  var tbtn=document.querySelector('.timer .tbtn'), stop=document.querySelector('.timer .stop');
+  if(tbtn){ tbtn.style.cursor='pointer'; tbtn.title='Pause / resume';
+    tbtn.addEventListener('click',function(){ running=!running; this.style.opacity=running?'1':'.55'; }); }
+  if(stop){ stop.style.cursor='pointer'; stop.title='Reset';
+    stop.addEventListener('click',function(){ secs=0; if(clock) clock.textContent=fmt(0); }); }
+
+  /* ---- editable update areas + note (user can type) ---- */
+  var note=document.querySelector('.note-row');
+  var noteHTML=note?note.innerHTML:'';
+  var bodies=[].slice.call(document.querySelectorAll('.ucard-body'));
+  bodies.forEach(function(b){ b.setAttribute('contenteditable','true');
+    b.style.padding='14px 16px'; b.style.outline='none'; b.style.fontSize='13.5px';
+    b.style.color='var(--ink-2)'; b.style.lineHeight='1.6'; });
+
+  function typeInto(el,text,speed,done){ if(!el){done&&done();return;} el.textContent=''; var i=0;
+    (function s(){ if(i<=text.length){ el.textContent=text.slice(0,i++); setTimeout(s,speed);} else done&&done(); })(); }
+
+  function reset(){ if(note) note.innerHTML=noteHTML; bodies.forEach(function(b){ b.textContent=''; }); }
+
+  function autofill(){
+    if(note){ note.innerHTML='<span class="add" style="color:var(--teal);font-weight:600">Note</span>'
+      +'<span class="na typed" style="color:var(--ink-2)"></span>';
+      typeInto(note.querySelector('.typed'),'  Patient reports improved BP readings; continue sodium restriction and daily logging.',20); }
+    if(bodies[0]) setTimeout(function(){ typeInto(bodies[0],
+      'Reviewed monthly goals with patient. Adherence to the low-sodium diet is improving and BP is trending toward the 120/80 target. Continue daily home BP logging.',18); },700);
+    if(bodies[1]) setTimeout(function(){ typeInto(bodies[1],
+      'Tobacco cessation discussed; patient open to nicotine replacement. Fatigue barrier being monitored and diet adherence reinforced.',18); },2600);
+  }
+
+  window.addEventListener('message',function(e){
+    var d=e.data||{}; if(!d.ecmReplay) return;
+    if(d.autofill) autofill(); else reset();
+  });
+})();
+</script>
+<script src="../assets/nav.js"></script>
+</body>
+</html>

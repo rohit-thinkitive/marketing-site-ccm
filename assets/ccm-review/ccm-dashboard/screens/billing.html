@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<style>
+@font-face{font-family:'Inter';font-style:normal;font-weight:400 800;font-display:swap;src:url(../vendor/inter-latin-sub.woff2) format('woff2')}
+@font-face{font-family:'Manrope';font-style:normal;font-weight:200 800;font-display:swap;src:url(../vendor/manrope-latin.woff2) format('woff2')}
+</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>eCareMD — Billing</title>
+<link rel="stylesheet" href="../assets/app.css">
+<style>
+  .b-tabs{display:flex;align-items:center;gap:28px;padding:0 20px;border-bottom:1px solid var(--line)}
+  .b-tab{padding:16px 2px;font-size:14px;font-weight:600;color:var(--ink-3);position:relative;white-space:nowrap}
+  .b-tab.on{color:var(--teal)}
+  .b-tab.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2.5px;background:var(--teal);border-radius:2px}
+  .b-actions{margin-left:auto;display:flex;align-items:center;gap:12px;padding:9px 0}
+
+  .tbl-wrap{overflow:hidden}
+  .panel .tbl td{padding-top:10px;padding-bottom:10px}
+  .panel .tbl th{padding-top:12px;padding-bottom:12px}
+  .tbl th{vertical-align:middle}
+  .tbl th .grip{color:var(--ink-4);margin-left:6px;letter-spacing:-1.5px;font-size:12px;font-weight:700;vertical-align:middle}
+  .tbl th .sort{display:inline-flex;flex-direction:column;line-height:.5;margin-left:5px;color:var(--ink-4);vertical-align:middle}
+  .flag-pill{display:inline-block;width:34px;height:16px;border-radius:5px;background:linear-gradient(90deg,#F2C94C,#EFC03A)}
+  .pencil{color:var(--ink-3);vertical-align:middle}
+  .acts{color:var(--ink-3);font-size:20px;letter-spacing:1px;line-height:1}
+  .cellgap{display:inline-flex;align-items:center;gap:8px}
+
+  .scrolltrack{padding:14px 20px 6px}
+  .scrollbar{height:12px;border-radius:7px;background:#B6BEC5}
+  .pg-arrow{width:30px;height:30px;border:1px solid #D7DDE2;border-radius:7px;display:inline-grid;place-items:center;color:var(--ink-3)}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <nav class="snav">
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Dashboard</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Patients</a>
+      <a class="on" href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v16"/></svg>Billing &amp; Claims</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Call Scheduler</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9Z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>Alerts</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg>Communications</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 11 3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>Task</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 9h8M8 13h5"/></svg>Education</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2Z"/><path d="M8 3v18"/></svg>Library</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.9 1.09V21a2 2 0 1 1-4 0 1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 5 14.6a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4 1.65 1.65 0 0 0 1.51-1.08 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0 1.65 1.65 0 0 0 1.08 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4 1.65 1.65 0 0 0-1.51 1Z"/></svg>Settings</a>
+    </nav>
+    <div class="side-foot">
+      <div class="lbl">SUPPORT USER</div>
+      <div class="mail">support+TP@medarch.com</div>
+      <div class="logout"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>Logout</div>
+    </div>
+  </aside>
+
+  <!-- ===== CONTENT ===== -->
+  <div class="content">
+    <!-- HEADER -->
+    <header class="topbar">
+      <img class="logo" src="../ecaremd-logo.svg" alt="eCareMD">
+      <button class="collapse-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m11 17-5-5 5-5M18 17l-5-5 5-5"/></svg></button>
+      <nav class="topnav">
+        <a class="on" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a3 3 0 1 0-3-3M6 21v-2a4 4 0 0 1 4-4h1"/><circle cx="9" cy="7" r="3"/><path d="m14 14 2 2 4-4"/></svg>CCM</a>
+        <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg>RPM<svg class="chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></a>
+        <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a6 6 0 0 1 12 0v2"/></svg>PCM</a>
+        <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20v-1a5 5 0 0 1 10 0v1M14 20v-1a4 4 0 0 1 7-2.6"/></svg>TCM</a>
+        <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16"/></svg>ALL</a>
+      </nav>
+      <div class="topright">
+        <div class="icon-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M15 2v6M12 5h6"/><path d="M6.5 3A2.5 2.5 0 0 0 4 5.5C4 13 11 20 18.5 20A2.5 2.5 0 0 0 21 17.5v-2a1 1 0 0 0-.8-1l-3-.6a1 1 0 0 0-1 .4l-.8 1a12 12 0 0 1-5-5l1-.8a1 1 0 0 0 .4-1L11 4.3a1 1 0 0 0-1-.8Z"/></svg></div>
+        <div class="org-select">PrimeCare Physicians <span class="stack"><svg width="12" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 15 6-6 6 6"/></svg><svg width="12" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg></span></div>
+        <button class="btn-admin"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M17 3 21 7l-4 4M21 7H8M7 21l-4-4 4-4M3 17h13"/></svg>Switch to Admin</button>
+        <span class="hicon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+        <span class="hicon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9Z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg></span>
+        <button class="btn-new"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 11 0"/><path d="M18 8v6M15 11h6"/></svg>New Patients</button>
+      </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="main">
+      <!-- TITLE ROW -->
+      <div style="display:flex;align-items:center;margin-bottom:18px">
+        <h1 class="h-title">Billing</h1>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:14px">
+          <div class="seg"><button class="on">CCM</button><button>TCM</button><button>RPM</button></div>
+          <div class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input placeholder="Search"></div>
+        </div>
+      </div>
+
+      <!-- PANEL -->
+      <div class="panel">
+        <!-- TAB ROW -->
+        <div class="b-tabs">
+          <span class="b-tab on">CCM Billing</span>
+          <span class="b-tab">PCM Billing</span>
+          <div class="b-actions">
+            <button class="btn btn-teal">Export</button>
+            <div class="pager"><span class="a"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></span><span class="m">June 2026</span><span class="a"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 18 6-6-6-6"/></svg></span></div>
+            <button class="btn btn-out"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 5h18l-7 8v6l-4 2v-8Z"/></svg>Filter</button>
+          </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th style="width:44px"><span class="chk"></span></th>
+                <th>Patient ID <span class="sort"><svg width="9" height="6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 15 6-6 6 6"/></svg><svg width="9" height="6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg></span><span class="grip">⁞⁞</span></th>
+                <th>Flags <span class="grip">⁞⁞</span></th>
+                <th>Patient Name <span class="sort"><svg width="9" height="6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 15 6-6 6 6"/></svg><svg width="9" height="6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg></span><span class="grip">⁞⁞</span></th>
+                <th>Care Team <span class="grip">⁞⁞</span></th>
+                <th>Eligible Billing Codes <span class="grip">⁞⁞</span></th>
+                <th>Total Time Monitoring<br>(Min) <span class="sort"><svg width="9" height="6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 15 6-6 6 6"/></svg><svg width="9" height="6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg></span><span class="grip">⁞⁞</span></th>
+                <th>CM/PHY</th>
+                <th>Billing Status <span class="grip">⁞⁞</span></th>
+                <th style="width:80px">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="chk"></span></td>
+                <td>36710</td>
+                <td><span class="flag-pill"></span></td>
+                <td>Steve Noir</td>
+                <td><span class="cellgap"><span class="chip">DAVID …</span><span class="chip-plus">+1</span></span></td>
+                <td><span class="chip">G0506 …</span></td>
+                <td>0.23</td>
+                <td>0.2/0.0</td>
+                <td>On Hold</td>
+                <td><span class="acts">⋯</span></td>
+              </tr>
+              <tr>
+                <td><span class="chk"></span></td>
+                <td>1160</td>
+                <td><svg class="pencil" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></td>
+                <td>Sophia Thomas</td>
+                <td><span class="cellgap"><span class="chip">DAVID …</span><span class="chip-plus">+1</span></span></td>
+                <td><span class="cellgap"><span class="chip">99490 …</span><span class="chip-plus">+1</span></span></td>
+                <td>63.00</td>
+                <td>63.0/0.0</td>
+                <td>Submitted</td>
+                <td><span class="acts">⋯</span></td>
+              </tr>
+              <tr>
+                <td><span class="chk"></span></td>
+                <td>1163</td>
+                <td><svg class="pencil" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></td>
+                <td>Daniel Jackson</td>
+                <td><span class="cellgap"><span class="chip">DAVID …</span><span class="chip-plus">+2</span></span></td>
+                <td><span class="chip">99490 …</span></td>
+                <td>22.35</td>
+                <td>22.4/0.0</td>
+                <td>Submitted</td>
+                <td><span class="acts">⋯</span></td>
+              </tr>
+              <tr>
+                <td><span class="chk"></span></td>
+                <td>1162</td>
+                <td><svg class="pencil" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></td>
+                <td>Harper Moore</td>
+                <td><span class="cellgap"><span class="chip">DAVID …</span><span class="chip-plus">+2</span></span></td>
+                <td><span class="cellgap"><span class="chip">99487 …</span><span class="chip-plus">+1</span></span></td>
+                <td>142.00</td>
+                <td>122.0/20.0</td>
+                <td>Submitted</td>
+                <td><span class="acts">⋯</span></td>
+              </tr>
+              <tr>
+                <td><span class="chk"></span></td>
+                <td>1161</td>
+                <td><svg class="pencil" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></td>
+                <td>Alexander Taylor</td>
+                <td><span class="cellgap"><span class="chip">DAVID …</span><span class="chip-plus">+1</span></span></td>
+                <td><span class="chip">99490 …</span></td>
+                <td>22.00</td>
+                <td>22.0/0.0</td>
+                <td>Submitted</td>
+                <td><span class="acts">⋯</span></td>
+              </tr>
+              <tr>
+                <td><span class="chk"></span></td>
+                <td>1159</td>
+                <td><svg class="pencil" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></td>
+                <td>Henry Anderson</td>
+                <td><span class="cellgap"><span class="chip">DAVID …</span><span class="chip-plus">+1</span></span></td>
+                <td><span class="chip">99490 …</span></td>
+                <td>22.00</td>
+                <td>22.0/0.0</td>
+                <td>Submitted</td>
+                <td><span class="acts">⋯</span></td>
+              </tr>
+              <tr>
+                <td><span class="chk"></span></td>
+                <td>1158</td>
+                <td><svg class="pencil" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></td>
+                <td>Amelia Wilson</td>
+                <td><span class="cellgap"><span class="chip">DAVID …</span><span class="chip-plus">+1</span></span></td>
+                <td><span class="cellgap"><span class="chip">99490 …</span><span class="chip-plus">+1</span></span></td>
+                <td>60.00</td>
+                <td>60.0/0.0</td>
+                <td>Submitted</td>
+                <td><span class="acts">⋯</span></td>
+              </tr>
+              <tr>
+                <td><span class="chk"></span></td>
+                <td>1156</td>
+                <td><svg class="pencil" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></td>
+                <td>Charlotte Lopez</td>
+                <td><span class="cellgap"><span class="chip">DAVID …</span><span class="chip-plus">+1</span></span></td>
+                <td><span class="chip">99490 …</span></td>
+                <td>31.00</td>
+                <td>31.0/0.0</td>
+                <td>Submitted</td>
+                <td><span class="acts">⋯</span></td>
+              </tr>
+              <tr>
+                <td><span class="chk"></span></td>
+                <td>2182</td>
+                <td><svg class="pencil" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></td>
+                <td>Ryan Chase</td>
+                <td><span class="cellgap"><span class="chip">DAVID …</span><span class="chip-plus">+2</span></span></td>
+                <td><span class="cellgap"><span class="chip">99491 …</span><span class="chip-plus">+1</span></span></td>
+                <td>63.00</td>
+                <td>0.0/63.0</td>
+                <td>Submitted</td>
+                <td><span class="acts">⋯</span></td>
+              </tr>
+              <tr>
+                <td><span class="chk"></span></td>
+                <td>4708</td>
+                <td><svg class="pencil" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></td>
+                <td>Stephen Oliver</td>
+                <td><span class="cellgap"><span class="chip">PRIYA …</span></span></td>
+                <td><span class="chip">99491 …</span></td>
+                <td>31.00</td>
+                <td>0.0/31.0</td>
+                <td>Submitted</td>
+                <td><span class="acts">⋯</span></td>
+              </tr>
+              <tr>
+                <td><span class="chk"></span></td>
+                <td>4088</td>
+                <td><svg class="pencil" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></td>
+                <td>Max Welton</td>
+                <td><span class="cellgap"><span class="chip">DAVID …</span><span class="chip-plus">+1</span></span></td>
+                <td><span class="chip">99491 …</span></td>
+                <td>32.00</td>
+                <td>0.0/32.0</td>
+                <td>Submitted</td>
+                <td><span class="acts">⋯</span></td>
+              </tr>
+              <tr>
+                <td><span class="chk"></span></td>
+                <td>4076</td>
+                <td><svg class="pencil" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></td>
+                <td>Daniel Vance</td>
+                <td><span class="cellgap"><span class="chip">DAVID …</span><span class="chip-plus">+1</span></span></td>
+                <td><span class="cellgap"><span class="chip">99491 …</span><span class="chip-plus">+1</span></span></td>
+                <td>64.00</td>
+                <td>0.0/64.0</td>
+                <td>Claim Paid</td>
+                <td><span class="acts">⋯</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- SCROLLBAR TRACK -->
+        <div class="scrolltrack"><div class="scrollbar"></div></div>
+
+        <!-- FOOTER -->
+        <div class="pgfoot">
+          <div class="rpp">Rows per page
+            <span class="box">50 <span class="stack"><svg width="12" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 15 6-6 6 6"/></svg><svg width="12" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg></span></span>
+          </div>
+          <span>1-12 of 12</span>
+          <span class="pg-arrow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></span>
+          <span class="pg-arrow"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 18 6-6-6-6"/></svg></span>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/nav.js"></script>
+</body>
+</html>

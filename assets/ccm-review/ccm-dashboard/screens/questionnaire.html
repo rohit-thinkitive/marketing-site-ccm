@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+<head>
+<style>
+@font-face{font-family:'Inter';font-style:normal;font-weight:400 800;font-display:swap;src:url(../vendor/inter-latin-sub.woff2) format('woff2')}
+@font-face{font-family:'Manrope';font-style:normal;font-weight:200 800;font-display:swap;src:url(../vendor/manrope-latin.woff2) format('woff2')}
+</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>eCareMD — Condition Questionnaire</title>
+<link rel="stylesheet" href="../assets/app.css">
+<style>
+  /* ---- dimmed background hints ---- */
+  .pc-head{display:flex;align-items:center;gap:16px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .pc-av{width:46px;height:46px;border-radius:10px;background:var(--teal-soft);display:grid;place-items:center;color:var(--teal);flex:0 0 46px}
+  .pc-name{font-size:17px;font-weight:700;color:var(--ink)}
+  .pc-sub{font-size:12.5px;color:var(--ink-3);margin-top:3px}
+  .pc-right{margin-left:auto;display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--ink-2);font-weight:600}
+  .pc-tabs{display:flex;align-items:center;gap:10px;margin-top:16px}
+  .pc-tab{padding:12px 20px;border-radius:9px;font-size:14px;font-weight:600;color:var(--ink-3);background:#fff;border:1px solid var(--line)}
+  .pc-tab.on{background:var(--teal);color:#fff;border-color:var(--teal)}
+  .pc-subtabs{display:flex;gap:22px;margin-top:16px;font-size:13.5px;font-weight:600;color:var(--ink-3)}
+  .pc-subtabs .on{color:var(--teal)}
+  .pc-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-top:16px}
+  .pc-card h4{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:10px}
+  .pc-li{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--ink-2);padding:4px 0}
+  .pc-li .b{width:6px;height:6px;border-radius:50%;background:var(--ink);margin-top:6px;flex:0 0 6px}
+
+  /* ---- dim overlay ---- */
+  .overlay{position:fixed;inset:0;background:rgba(15,30,35,.45);z-index:40}
+
+  /* ---- modal ---- */
+  .modal{position:fixed;top:0;right:0;bottom:0;width:60%;min-width:900px;background:#fff;
+    border-top-left-radius:16px;border-bottom-left-radius:16px;z-index:50;
+    display:flex;flex-direction:column;box-shadow:-20px 0 60px rgba(15,30,35,.25);overflow:hidden}
+
+  /* modal header */
+  .mhead{display:flex;align-items:center;gap:16px;height:74px;flex:0 0 74px;
+    padding:0 22px;border-bottom:1px solid var(--line);background:#fff}
+  .timer{display:flex;align-items:center;gap:10px;height:44px;padding:0 16px;
+    border:1px solid var(--line);border-radius:9px;font-size:16px;font-weight:700;color:var(--ink)}
+  .timer .stop{width:14px;height:14px;border-radius:3px;background:var(--red);flex:0 0 14px}
+  .timer .refresh{color:var(--ink-3)}
+  .mname{font-size:16px;font-weight:700;color:var(--ink);white-space:nowrap}
+  .datebox{display:flex;align-items:center;height:44px;padding:0 14px;border:1px solid var(--line);
+    border-radius:9px;font-size:13.5px;font-weight:600;color:var(--ink);white-space:nowrap}
+  .mlink{color:var(--teal);font-size:14px;font-weight:600;white-space:nowrap}
+  .mhead .spacer{margin-left:auto}
+  .mbtn{display:inline-flex;align-items:center;justify-content:center;height:44px;padding:0 22px;
+    border-radius:9px;font-size:14px;font-weight:600;white-space:nowrap}
+  .mbtn-out{background:#fff;border:1.5px solid var(--teal);color:var(--teal)}
+  .mbtn-fill{background:var(--teal);color:#fff}
+
+  /* modal body */
+  .mbody{flex:1;display:flex;min-height:0}
+
+  /* stepper column */
+  .stepper{width:250px;flex:0 0 250px;padding:26px 0 26px 30px;overflow:hidden;position:relative}
+  .step{display:flex;align-items:center;gap:14px;position:relative;padding:9px 0;z-index:1}
+  .step .circ{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+    font-size:14px;font-weight:700;background:#fff;flex:0 0 34px}
+  .step .circ.done{background:var(--teal);color:#fff;border:2px solid var(--teal)}
+  .step .circ.active{background:#fff;color:var(--teal);border:2px solid var(--teal)}
+  .step .circ.idle{background:#fff;color:var(--ink-3);border:2px solid var(--line)}
+  .step .lbl{font-size:15px;font-weight:600;color:var(--ink-2)}
+  .step.active-lbl .lbl{color:var(--ink)}
+  /* vertical connector line */
+  .stepline{position:absolute;left:46px;top:44px;bottom:20px;width:2px;background:var(--line);z-index:0}
+
+  /* questions column */
+  .questions{flex:1;min-width:0;padding:22px 26px;overflow-y:auto;background:#fff;
+    border-left:1px solid var(--line-soft)}
+  .qblock{border:1px solid var(--line);border-radius:12px;padding:22px 24px;margin-bottom:20px}
+  .qtitle{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:16px}
+  .opt{display:flex;align-items:center;gap:13px;padding:7px 0;font-size:14.5px;color:var(--ink-2)}
+  .radio{width:20px;height:20px;border-radius:50%;border:1.6px solid #C4CDD4;flex:0 0 20px}
+  .box{width:20px;height:20px;border-radius:5px;border:1.6px solid #C4CDD4;flex:0 0 20px}
+  .noteinput{width:100%;height:52px;border:1px solid var(--line);border-radius:9px;
+    padding:0 16px;font:inherit;font-size:14px;color:var(--ink-3);display:flex;align-items:center;margin-top:14px}
+
+  /* floating support button */
+  .support-fab{position:absolute;right:26px;bottom:26px;width:52px;height:52px;border-radius:50%;
+    background:var(--teal);display:grid;place-items:center;color:#fff;
+    box-shadow:0 8px 22px rgba(22,160,144,.45);z-index:60}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <nav class="snav">
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Dashboard</a>
+      <a class="on" href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Patients</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v16"/></svg>Billing &amp; Claims</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Call Scheduler</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9Z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>Alerts</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg>Communications</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 11 3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>Task</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 9h8M8 13h5"/></svg>Education</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2Z"/><path d="M8 3v18"/></svg>Library</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.9 1.09V21a2 2 0 1 1-4 0 1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 5 14.6a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4 1.65 1.65 0 0 0 1.51-1.08 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0 1.65 1.65 0 0 0 1.08 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4 1.65 1.65 0 0 0-1.51 1Z"/></svg>Settings</a>
+    </nav>
+    <div class="side-foot">
+      <div class="lbl">SUPPORT USER</div>
+      <div class="mail">support+TP@medarch.com</div>
+      <div class="logout"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>Logout</div>
+    </div>
+  </aside>
+
+  <!-- ===== CONTENT ===== -->
+  <div class="content">
+    <header class="topbar">
+      <img class="logo" src="../ecaremd-logo.svg" alt="eCareMD">
+      <button class="collapse-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m11 17-5-5 5-5M18 17l-5-5 5-5"/></svg></button>
+      <nav class="topnav">
+        <a class="on" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a3 3 0 1 0-3-3M6 21v-2a4 4 0 0 1 4-4h1"/><circle cx="9" cy="7" r="3"/><path d="m14 14 2 2 4-4"/></svg>CCM</a>
+        <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg>RPM<svg class="chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></a>
+        <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a6 6 0 0 1 12 0v2"/></svg>PCM</a>
+        <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20v-1a5 5 0 0 1 10 0v1M14 20v-1a4 4 0 0 1 7-2.6"/></svg>TCM</a>
+        <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16"/></svg>ALL</a>
+      </nav>
+      <div class="topright">
+        <div class="icon-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M15 2v6M12 5h6"/><path d="M6.5 3A2.5 2.5 0 0 0 4 5.5C4 13 11 20 18.5 20A2.5 2.5 0 0 0 21 17.5v-2a1 1 0 0 0-.8-1l-3-.6a1 1 0 0 0-1 .4l-.8 1a12 12 0 0 1-5-5l1-.8a1 1 0 0 0 .4-1L11 4.3a1 1 0 0 0-1-.8Z"/></svg></div>
+        <div class="org-select">PrimeCare Physicians <span class="stack"><svg width="12" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 15 6-6 6 6"/></svg><svg width="12" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg></span></div>
+        <button class="btn-admin"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M17 3 21 7l-4 4M21 7H8M7 21l-4-4 4-4M3 17h13"/></svg>Switch to Admin</button>
+        <span class="hicon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+        <span class="hicon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9Z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg></span>
+        <button class="btn-new"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 11 0"/><path d="M18 8v6M15 11h6"/></svg>New Patients</button>
+      </div>
+    </header>
+
+    <!-- MAIN (dimmed patient-detail hint) -->
+    <main class="main">
+      <div class="pc-head">
+        <div class="pc-av" style="padding:0;overflow:hidden;background:#EEF1F4"><img src="../vendor/adam-image.webp" alt="Cindy Russell" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+        <div>
+          <div class="pc-name">Cindy Russell</div>
+          <div class="pc-sub">39801 | MALE | 09-30-1949</div>
+        </div>
+        <div class="pc-right">
+          <span>Consent</span>
+          <span>Profile</span>
+        </div>
+      </div>
+      <div class="pc-tabs">
+        <span class="pc-tab on">Care Management</span>
+        <span class="pc-tab">Visit</span>
+        <span class="pc-tab">Clinicals</span>
+        <span class="pc-tab">Assessment</span>
+      </div>
+      <div class="pc-subtabs">
+        <span>Care Plan Overview</span>
+        <span>Care Plan Progress</span>
+        <span class="on">Condition Questionnaire</span>
+      </div>
+      <div class="pc-card">
+        <h4>Goals Important to the Patient</h4>
+        <div class="pc-li"><span class="b"></span>Complete tasks in a timely manner</div>
+        <div class="pc-li"><span class="b"></span>Establish a team of medical professionals, family, and friends</div>
+        <div class="pc-li"><span class="b"></span>Adhere to sodium restriction set by provider</div>
+        <div class="pc-li"><span class="b"></span>Check and log blood pressure daily or bring to appointments</div>
+        <div class="pc-li"><span class="b"></span>Exercise or be more physically active</div>
+      </div>
+      <div class="pc-card">
+        <h4>Potential Barriers</h4>
+        <div class="pc-li"><span class="b"></span>Current tobacco use</div>
+        <div class="pc-li"><span class="b"></span>Difficulty managing symptoms</div>
+        <div class="pc-li"><span class="b"></span>Diet adherence issues</div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ===== DIM OVERLAY ===== -->
+<div class="overlay"></div>
+
+<!-- ===== QUESTIONNAIRE MODAL ===== -->
+<div class="modal">
+  <!-- header -->
+  <div class="mhead">
+    <div class="timer">
+      <span class="stop"></span>
+      <span class="refresh"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v5h-5"/></svg></span>
+      00:01:05
+    </div>
+    <div class="mname">Cindy Russell</div>
+    <div class="datebox">07/09/2026 01:22 PM</div>
+    <div class="spacer"></div>
+    <a class="mlink" href="#">Finish &amp; Do later</a>
+    <button class="mbtn mbtn-out">Cancel</button>
+    <button class="mbtn mbtn-out">Previous</button>
+    <button class="mbtn mbtn-fill">Next</button>
+  </div>
+
+  <!-- body -->
+  <div class="mbody">
+    <!-- stepper -->
+    <div class="stepper">
+      <div class="stepline"></div>
+      <div class="step" data-step="1">
+        <div class="circ active">1</div>
+        <div class="lbl">Conditions</div>
+      </div>
+      <div class="step" data-step="2">
+        <div class="circ idle">2</div>
+        <div class="lbl">General Questions</div>
+      </div>
+      <div class="step" data-step="3"><div class="circ idle">3</div><div class="lbl">Goals</div></div>
+      <div class="step"><div class="circ idle">4</div><div class="lbl">Barrier</div></div>
+      <div class="step"><div class="circ idle">5</div><div class="lbl">Symptoms</div></div>
+      <div class="step"><div class="circ idle">6</div><div class="lbl">Interventions</div></div>
+      <div class="step"><div class="circ idle">7</div><div class="lbl">Support</div></div>
+      <div class="step"><div class="circ idle">8</div><div class="lbl">Allergies</div></div>
+      <div class="step"><div class="circ idle">9</div><div class="lbl">Medications</div></div>
+      <div class="step"><div class="circ idle">10</div><div class="lbl">Number To Track</div></div>
+      <div class="step"><div class="circ idle">11</div><div class="lbl">Expected Outcome</div></div>
+      <div class="step"><div class="circ idle">12</div><div class="lbl">Additional Note</div></div>
+    </div>
+
+    <!-- questions -->
+    <div class="questions">
+      <!-- STEP 1 · Conditions -->
+      <div class="qpanel" data-panel="1">
+        <div class="qblock">
+          <div class="qtitle">1. How would you rate your overall physical health</div>
+          <div class="opt"><span class="radio"></span>Excellent</div>
+          <div class="opt"><span class="radio"></span>Fair</div>
+          <div class="opt"><span class="radio"></span>Good</div>
+          <div class="opt"><span class="radio"></span>Poor</div>
+          <div class="opt"><span class="radio"></span>Very Good</div>
+          <div class="opt"><span class="radio"></span>N/A</div>
+          <div class="noteinput">Add a Note</div>
+        </div>
+        <div class="qblock">
+          <div class="qtitle">2. What activities of daily living (ADLs) do you currently require assistance with?</div>
+          <div class="opt"><span class="box"></span>Bathing</div>
+          <div class="opt"><span class="box"></span>Dressing</div>
+          <div class="opt"><span class="box"></span>Feeding</div>
+          <div class="opt"><span class="box"></span>Grooming</div>
+          <div class="opt"><span class="box"></span>Toileting</div>
+          <div class="opt"><span class="box"></span>Transferring</div>
+          <div class="opt"><span class="box"></span>Walking</div>
+          <div class="opt"><span class="box"></span>N/A</div>
+          <div class="noteinput">Free Text Note</div>
+        </div>
+        <div class="qblock">
+          <div class="qtitle">3. What instrumental activities of daily living (IADLs) do you currently require assistance with?</div>
+          <div class="opt"><span class="box"></span>Managing finances</div>
+          <div class="opt"><span class="box"></span>Managing medications</div>
+          <div class="opt"><span class="box"></span>Meal preparation</div>
+          <div class="opt"><span class="box"></span>Shopping</div>
+          <div class="opt"><span class="box"></span>Transportation</div>
+          <div class="opt"><span class="box"></span>N/A</div>
+          <div class="noteinput">Free Text Note</div>
+        </div>
+      </div>
+
+      <!-- STEP 2 · General Questions -->
+      <div class="qpanel" data-panel="2" hidden>
+        <div class="qblock">
+          <div class="qtitle">1. In the past week, how many days did you exercise?</div>
+          <div class="opt"><span class="radio"></span>1-2 days</div>
+          <div class="opt"><span class="radio"></span>3-4 days</div>
+          <div class="opt"><span class="radio"></span>5-7 days</div>
+          <div class="opt"><span class="radio"></span>No days</div>
+          <div class="opt"><span class="radio"></span>N/A</div>
+          <div class="noteinput">Add a Note</div>
+        </div>
+        <div class="qblock">
+          <div class="qtitle">2. What is your recommended diet?</div>
+          <div class="opt"><span class="box"></span>Cardiac diet (low fat, low sodium/salt)</div>
+          <div class="opt"><span class="box"></span>Diabetic diet (limits high carbohydrate foods)</div>
+          <div class="opt"><span class="box"></span>Fluid restriction</div>
+          <div class="opt"><span class="box"></span>High fiber diet</div>
+          <div class="opt"><span class="box"></span>High protein</div>
+          <div class="opt"><span class="box"></span>Low fat/low cholesterol diet (low fat in diet, typically &lt; 50g per day)</div>
+          <div class="opt"><span class="box"></span>Low protein (limits protein, typically &lt; 60g per day)</div>
+          <div class="opt"><span class="box"></span>Low sodium diet (low sodium or salt, typically &lt; 2000mg per day)</div>
+          <div class="opt"><span class="box"></span>Mechanical Soft (foods soft in texture and low fiber for those who have difficulty chewing)</div>
+          <div class="opt"><span class="box"></span>Other diet</div>
+          <div class="opt"><span class="box"></span>Renal diet (limiting potassium, salt, phosphorus, and protein)</div>
+          <div class="opt"><span class="box"></span>N/A</div>
+          <div class="noteinput">Free Text Note</div>
+        </div>
+      </div>
+
+      <!-- STEP 3 · Goals -->
+      <div class="qpanel" data-panel="3" hidden>
+        <div class="qblock">
+          <div class="qtitle">1. To help manage your Gastroesophageal Reflux Disease (GERD), let's choose some personal health goals to focus on. Here are some common goals that patients with GERD strive for. Which ones are the most important to you?</div>
+          <div class="opt"><span class="box"></span>Follow my recommended diet</div>
+          <div class="opt"><span class="box"></span>Quit smoking</div>
+          <div class="opt"><span class="box"></span>Take medications as prescribed</div>
+          <div class="opt"><span class="box"></span>Understand and implement lifestyle modifications to manage condition</div>
+          <div class="opt"><span class="box"></span>Understand signs and symptoms of when to call my doctor and when to seek emergency care</div>
+          <div class="opt"><span class="box"></span>Understand stress management and relaxation techniques</div>
+          <div class="opt"><span class="box"></span>Understand triggers and have a plan to avoid or reduce exposure</div>
+          <div class="opt"><span class="box"></span>N/A</div>
+          <div class="noteinput">Free Text Note</div>
+        </div>
+        <div class="qblock">
+          <div class="qtitle">2. To help manage your Gastroesophageal Reflux Disease (GERD), let's choose some personal health goals to focus on. Here are some common goals that patients with GERD strive for. Which ones are the most important to you?</div>
+          <div class="opt"><span class="box"></span>Follow my recommended diet</div>
+          <div class="opt"><span class="box"></span>Quit smoking</div>
+          <div class="opt"><span class="box"></span>Take medications as prescribed</div>
+          <div class="opt"><span class="box"></span>Understand and implement lifestyle modifications to manage condition</div>
+          <div class="opt"><span class="box"></span>Understand signs and symptoms of when to call my doctor and when to seek emergency care</div>
+          <div class="opt"><span class="box"></span>Understand stress management and relaxation techniques</div>
+          <div class="opt"><span class="box"></span>Understand triggers and have a plan to avoid or reduce exposure</div>
+          <div class="opt"><span class="box"></span>N/A</div>
+          <div class="noteinput">Free Text Note</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- floating support button -->
+  <div class="support-fab"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><path d="M4 14a2 2 0 0 1 2-2h1v6H6a2 2 0 0 1-2-2Z"/><path d="M20 14a2 2 0 0 0-2-2h-1v6h1a2 2 0 0 0 2-2Z"/><path d="M18 18v1a3 3 0 0 1-3 3h-3"/></svg></div>
+</div>
+
+<style>
+  .radio.sel{border-color:var(--teal);box-shadow:inset 0 0 0 4px var(--teal)}
+  .box.sel{border-color:var(--teal);background:var(--teal);position:relative}
+  .box.sel::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+  .opt{cursor:pointer}
+  .step{cursor:pointer}
+  .qpanel[hidden]{display:none}
+  /* in-screen simulated cursor */
+  #qcur{position:fixed;left:0;top:0;width:24px;height:24px;z-index:80;pointer-events:none;opacity:0;
+    transform:translate(-3px,-2px);
+    transition:left .8s cubic-bezier(.45,.05,.2,1),top .8s cubic-bezier(.45,.05,.2,1),opacity .3s ease;
+    filter:drop-shadow(0 3px 5px rgba(2,20,30,.35))}
+  #qcur.on{opacity:1}
+  #qcur.press svg{transform:scale(.82);transform-origin:0 0}
+  #qcur svg{transition:transform .18s ease}
+  .qripple{position:fixed;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;
+    background:rgba(22,160,144,.30);border:2px solid rgba(22,160,144,.85);z-index:79;pointer-events:none;
+    transform:scale(.4);opacity:.9;animation:qrip .55s ease-out forwards}
+  @keyframes qrip{to{transform:scale(3.2);opacity:0}}
+</style>
+<div id="qcur" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M5 2.5 19 12l-6.2 1.1 3.4 6.5-2.7 1.4-3.4-6.6L5 19.4Z" fill="#12303a" stroke="#fff" stroke-width="1.3" stroke-linejoin="round"/></svg></div>
+<script>
+(function(){
+  /* ---- working timer (modal header) ---- */
+  var box=document.querySelector('.mhead .timer');
+  var secs=65, running=true, clockNode=null;
+  if(box){ box.childNodes.forEach&&box.childNodes.forEach(function(n){ if(n.nodeType===3&&/\d\d:\d\d/.test(n.textContent)) clockNode=n; }); }
+  if(!clockNode && box){ clockNode=document.createTextNode('00:01:05'); box.appendChild(clockNode); }
+  function fmt(s){var h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;
+    return (h<10?'0':'')+h+':'+(m<10?'0':'')+m+':'+(ss<10?'0':'')+ss;}
+  setInterval(function(){ if(running){ secs++; if(clockNode) clockNode.textContent=' '+fmt(secs); } },1000);
+  var stopEl=document.querySelector('.mhead .timer .stop');
+  if(stopEl){ stopEl.style.cursor='pointer'; stopEl.title='Pause / resume';
+    stopEl.addEventListener('click',function(){ running=!running; this.style.opacity=running?'1':'.5'; }); }
+
+  /* ---- panels + stepper ---- */
+  var panels={}, steps={}, maxStep=3;
+  document.querySelectorAll('.qpanel').forEach(function(p){ panels[p.getAttribute('data-panel')]=p; });
+  document.querySelectorAll('.step[data-step]').forEach(function(s){ steps[s.getAttribute('data-step')]=s; });
+  function setCirc(step,cls,n){ var c=step.querySelector('.circ'); c.className='circ '+cls;
+    if(cls==='done'){ c.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-11"/></svg>'; }
+    else { c.textContent=n; } }
+  function goStep(n){
+    for(var i=1;i<=maxStep;i++){ if(panels[i]) panels[i].hidden=(i!==n); }
+    for(var j=1;j<=maxStep;j++){ var s=steps[j]; if(!s) continue;
+      s.classList.toggle('active-lbl', j===n);
+      setCirc(s, j<n?'done':(j===n?'active':'idle'), j); }
+    var q=document.querySelector('.questions'); if(q) q.scrollTop=0;
+  }
+
+  /* ---- user can click steps + tick options ---- */
+  document.querySelectorAll('.step[data-step]').forEach(function(s){
+    s.addEventListener('click',function(){ goStep(+s.getAttribute('data-step')); }); });
+  document.querySelectorAll('.opt').forEach(function(o){
+    o.addEventListener('click',function(){ var r=o.querySelector('.radio'), b=o.querySelector('.box');
+      if(r){ o.parentNode.querySelectorAll('.radio').forEach(function(x){x.classList.remove('sel');}); r.classList.add('sel'); }
+      if(b){ b.classList.toggle('sel'); } }); });
+
+  /* ---- simulated cursor ---- */
+  var cur=document.getElementById('qcur');
+  function moveToEl(el,cb){ if(!el||!cur){ cb&&cb(); return; } cur.classList.add('on');
+    var r=el.getBoundingClientRect(); cur.style.left=(r.left+r.width/2)+'px'; cur.style.top=(r.top+r.height/2)+'px';
+    setTimeout(cb||function(){}, 860); }
+  function press(el,cb){ if(cur){ cur.classList.remove('press'); void cur.offsetWidth; cur.classList.add('press');
+      if(el){ var r=el.getBoundingClientRect(), rp=document.createElement('div'); rp.className='qripple';
+        rp.style.left=(r.left+r.width/2)+'px'; rp.style.top=(r.top+r.height/2)+'px'; document.body.appendChild(rp);
+        setTimeout(function(){ if(rp.parentNode) rp.parentNode.removeChild(rp); },600); }
+      setTimeout(function(){ cur.classList.remove('press'); },200); }
+    setTimeout(cb||function(){},280); }
+
+  /* ---- fill one panel's options ---- */
+  function fillPanel(n,cb){
+    var panel=panels[n]; if(!panel){ cb&&cb(); return; }
+    panel.querySelectorAll('.radio,.box').forEach(function(x){ x.classList.remove('sel'); });
+    var picks=[];
+    panel.querySelectorAll('.qblock').forEach(function(qb){
+      var radios=qb.querySelectorAll('.radio'), boxes=qb.querySelectorAll('.box');
+      if(radios.length){ picks.push(radios[Math.min(2,radios.length-1)]); }
+      if(boxes.length){ picks.push(boxes[0]); if(boxes[2]) picks.push(boxes[2]); }
+    });
+    var i=0;
+    (function nx(){ if(i>=picks.length){ setTimeout(cb||function(){},450); return; }
+      picks[i].classList.add('sel'); i++; setTimeout(nx,300); })();
+  }
+
+  /* ---- guided in-screen tour: fill Conditions -> click General Questions -> fill -> click Goals -> fill -> click Next ---- */
+  var nextBtn=document.querySelector('.mbtn-fill'), touring=false;
+  function runTour(){
+    if(touring) return; touring=true; goStep(1);
+    fillPanel(1,function(){
+      moveToEl(steps[2],function(){ press(steps[2],function(){ goStep(2);
+        fillPanel(2,function(){
+          moveToEl(steps[3],function(){ press(steps[3],function(){ goStep(3);
+            fillPanel(3,function(){
+              moveToEl(nextBtn,function(){ press(nextBtn,function(){ touring=false; }); });
+            });
+          }); });
+        });
+      }); });
+    });
+  }
+
+  goStep(1);
+  runTour();
+  window.addEventListener('message',function(e){ if(e.data&&e.data.ecmReplay){ touring=false; if(cur) cur.classList.remove('on'); goStep(1); setTimeout(runTour,250); } });
+})();
+</script>
+<script src="../assets/nav.js"></script>
+</body>
+</html>

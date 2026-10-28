@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<style>
+@font-face{font-family:'Inter';font-style:normal;font-weight:400 800;font-display:swap;src:url(../vendor/inter-latin-sub.woff2) format('woff2')}
+@font-face{font-family:'Manrope';font-style:normal;font-weight:200 800;font-display:swap;src:url(../vendor/manrope-latin.woff2) format('woff2')}
+</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>eCareMD — Library</title>
+<link rel="stylesheet" href="../assets/app.css">
+<style>
+  .lib-tabs{display:flex;align-items:center;gap:34px;padding:0 24px;border-bottom:1px solid var(--line)}
+  .lib-tab{display:inline-flex;align-items:center;height:52px;font-size:14.5px;font-weight:600;color:var(--ink-3);border-bottom:2px solid transparent;margin-bottom:-1px}
+  .lib-tab.on{color:var(--teal);border-bottom-color:var(--teal)}
+  .lib-tools{margin-left:auto;display:flex;align-items:center;gap:14px}
+  .lib-tools .search{min-width:300px}
+
+  .tbl-wrap{padding:0 4px}
+  .tbl th{font-size:13px}
+  .tbl td{font-size:13.5px;color:var(--ink)}
+  .tbl .num-col{color:var(--ink-2)}
+  .dots-act{color:var(--ink-4);font-size:20px;letter-spacing:1px;line-height:1}
+
+  .pg-select{display:inline-flex;align-items:center;gap:14px;border:1px solid #D7DDE2;border-radius:7px;padding:6px 10px;font-weight:600;color:var(--ink);font-size:13.5px}
+  .pg-nav{display:flex;align-items:center;gap:14px;color:var(--ink-3)}
+  .pg-nav .pa{display:grid;place-items:center;color:var(--ink-3)}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <nav class="snav">
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Dashboard</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Patients</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v16"/></svg>Billing &amp; Claims</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Call Scheduler</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9Z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>Alerts</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg>Communications</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 11 3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>Task</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 9h8M8 13h5"/></svg>Education</a>
+      <a class="on" href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2Z"/><path d="M8 3v18"/></svg>Library</a>
+      <a href="#"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.9 1.09V21a2 2 0 1 1-4 0 1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 5 14.6a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4 1.65 1.65 0 0 0 1.51-1.08 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0 1.65 1.65 0 0 0 1.08 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4 1.65 1.65 0 0 0-1.51 1Z"/></svg>Settings</a>
+    </nav>
+    <div class="side-foot">
+      <div class="lbl">SUPPORT USER</div>
+      <div class="mail">support+TP@medarch.com</div>
+      <div class="logout"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>Logout</div>
+    </div>
+  </aside>
+
+  <!-- ===== CONTENT ===== -->
+  <div class="content">
+    <!-- HEADER -->
+    <header class="topbar">
+      <img class="logo" src="../ecaremd-logo.svg" alt="eCareMD">
+      <button class="collapse-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m11 17-5-5 5-5M18 17l-5-5 5-5"/></svg></button>
+      <nav class="topnav">
+        <a class="on" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a3 3 0 1 0-3-3M6 21v-2a4 4 0 0 1 4-4h1"/><circle cx="9" cy="7" r="3"/><path d="m14 14 2 2 4-4"/></svg>CCM</a>
+        <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg>RPM<svg class="chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></a>
+        <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a6 6 0 0 1 12 0v2"/></svg>PCM</a>
+        <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20v-1a5 5 0 0 1 10 0v1M14 20v-1a4 4 0 0 1 7-2.6"/></svg>TCM</a>
+        <a href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16"/></svg>ALL</a>
+      </nav>
+      <div class="topright">
+        <div class="icon-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M15 2v6M12 5h6"/><path d="M6.5 3A2.5 2.5 0 0 0 4 5.5C4 13 11 20 18.5 20A2.5 2.5 0 0 0 21 17.5v-2a1 1 0 0 0-.8-1l-3-.6a1 1 0 0 0-1 .4l-.8 1a12 12 0 0 1-5-5l1-.8a1 1 0 0 0 .4-1L11 4.3a1 1 0 0 0-1-.8Z"/></svg></div>
+        <div class="org-select">PrimeCare Physicians <span class="stack"><svg width="12" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 15 6-6 6 6"/></svg><svg width="12" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg></span></div>
+        <button class="btn-admin"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M17 3 21 7l-4 4M21 7H8M7 21l-4-4 4-4M3 17h13"/></svg>Switch to Admin</button>
+        <span class="hicon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+        <span class="hicon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9Z"/><path d="M10 21a2 2 0 0 0 4 0"/></svg></span>
+        <button class="btn-new"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 11 0"/><path d="M18 8v6M15 11h6"/></svg>New Patients</button>
+      </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="main">
+      <div class="panel">
+        <!-- TAB ROW -->
+        <div class="lib-tabs">
+          <span class="lib-tab on">Care Plan</span>
+          <span class="lib-tab">Assessment</span>
+          <span class="lib-tab">ICD</span>
+          <span class="lib-tab">Conditions</span>
+          <span class="lib-tab">Templates</span>
+          <span class="lib-tab">Log As</span>
+          <div class="lib-tools">
+            <div class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input placeholder="Type here to Search"></div>
+            <button class="btn btn-out"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 3H2l8 9.5V19l4 2v-8.5L22 3Z"/></svg>Filters</button>
+            <button class="btn btn-teal"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Create Care Plan</button>
+          </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Sr. No</th>
+                <th><span class="th-sort">Title <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 4v16M8 20l-3-3M8 4l3 3M16 20V4M16 4l-3 3M16 20l3-3"/></svg></span></th>
+                <th>Program</th>
+                <th>Condition</th>
+                <th><span class="th-sort">Created Date <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 4v16M8 20l-3-3M8 4l3 3M16 20V4M16 4l-3 3M16 20l3-3"/></svg></span></th>
+                <th>Created By</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="num-col">1</td><td>WFSDVFDSVDF - 559</td><td>CCM</td><td>23-polyvalent pneumococcal polysaccharide vaccine administered</td><td>06/09/2026</td><td>Sushant Kadam</td><td><span class="dots-act">⋯</span></td></tr>
+              <tr><td class="num-col">2</td><td>test - 516</td><td>PCM</td><td>23-polyvalent pneumococcal polysaccharide vaccine administered</td><td>06/09/2026</td><td>Sushant Kadam</td><td><span class="dots-act">⋯</span></td></tr>
+              <tr><td class="num-col">3</td><td>test - 269</td><td>PCM</td><td>23-polyvalent pneumococcal polysaccharide vaccine administered</td><td>06/09/2026</td><td>Sushant Kadam</td><td><span class="dots-act">⋯</span></td></tr>
+              <tr><td class="num-col">4</td><td>RPM - 112</td><td>RPM</td><td>23-polyvalent pneumococcal polysaccharide vaccine administered</td><td>06/09/2026</td><td>Sushant Kadam</td><td><span class="dots-act">⋯</span></td></tr>
+              <tr><td class="num-col">5</td><td>APCM+ - 230</td><td>APCM</td><td>Bladder Cancer</td><td>06/09/2026</td><td>Sushant Kadam</td><td><span class="dots-act">⋯</span></td></tr>
+              <tr><td class="num-col">6</td><td>APCM+</td><td>APCM</td><td>Bladder Cancer</td><td>06/09/2026</td><td>Support user</td><td><span class="dots-act">⋯</span></td></tr>
+              <tr><td class="num-col">7</td><td>RPM</td><td>RPM</td><td>23-polyvalent pneumococcal polysaccharide vaccine administered</td><td>06/08/2026</td><td>Sushant Kadam</td><td><span class="dots-act">⋯</span></td></tr>
+              <tr><td class="num-col">8</td><td>test</td><td>PCM</td><td>23-polyvalent pneumococcal polysaccharide vaccine administered</td><td>06/05/2026</td><td>Sushant Kadam</td><td><span class="dots-act">⋯</span></td></tr>
+              <tr><td class="num-col">9</td><td>WFSDVFDSVDF</td><td>CCM</td><td>23-polyvalent pneumococcal polysaccharide vaccine administered</td><td>04/21/2026</td><td>Support user</td><td><span class="dots-act">⋯</span></td></tr>
+              <tr><td class="num-col">10</td><td>Acid Reflux (GERD) - 215</td><td>CCM</td><td>Acid Reflux (GERD)</td><td>03/10/2026</td><td>Support user</td><td><span class="dots-act">⋯</span></td></tr>
+              <tr><td class="num-col">11</td><td>Acid Reflux (GERD) - 149 - 530</td><td>CCM</td><td>Acid Reflux (GERD)</td><td>03/10/2026</td><td>Support user</td><td><span class="dots-act">⋯</span></td></tr>
+              <tr><td class="num-col">12</td><td>Hypertension</td><td>CCM</td><td>Abdominal actinomycosis</td><td>02/19/2026</td><td>Support user</td><td><span class="dots-act">⋯</span></td></tr>
+              <tr><td class="num-col">13</td><td>Acid Reflux (GERD) - 328 - 486</td><td>CCM</td><td>Acid Reflux (GERD)</td><td>01/14/2026</td><td>Support user</td><td><span class="dots-act">⋯</span></td></tr>
+              <tr><td class="num-col">14</td><td>Alzheimer's Disease - 152</td><td>CCM</td><td>Alzheimer's Disease</td><td>01/07/2026</td><td>Sushant Kadam</td><td><span class="dots-act">⋯</span></td></tr>
+              <tr><td class="num-col">15</td><td>Hypertension (High Blood Pressure / HBP / HTN) - 490</td><td>CCM</td><td>Hypertension (High Blood Pressure / HBP / HTN)</td><td>12/18/2025</td><td>Support user</td><td><span class="dots-act">⋯</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="pgfoot">
+          <div class="rpp">
+            <span>Rows per page</span>
+            <span class="pg-select">15 <svg width="12" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg></span>
+          </div>
+          <span>1-15 of 155</span>
+          <div class="pg-nav">
+            <span class="pa"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 12 12l6 6M7 6v12"/></svg></span>
+            <span class="pa"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></span>
+            <span class="pa"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 18 6-6-6-6"/></svg></span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../assets/nav.js"></script>
+</body>
+</html>

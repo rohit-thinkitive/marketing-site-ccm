@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>eCareMD — CCM Demo</title>
+<style>
+  html,body{margin:0;padding:0;height:100%;background:#F5F7F9;overflow:hidden;}
+  #ecm-stage{position:fixed;inset:0;}
+  .ecm-frame{position:absolute;inset:0;width:100%;height:100%;border:0;background:#F5F7F9;
+    opacity:0;visibility:hidden;pointer-events:none;transition:opacity .55s ease;z-index:1;}
+  .ecm-frame.active{opacity:1;visibility:visible;pointer-events:auto;z-index:2;}
+
+  /* simulated guided-tour cursor */
+  #ecm-cursor{position:absolute;left:50%;top:64%;width:26px;height:26px;z-index:30;pointer-events:none;
+    opacity:0;transform:translate(-4px,-2px);
+    transition:left .9s cubic-bezier(.45,.05,.2,1), top .9s cubic-bezier(.45,.05,.2,1), opacity .3s ease;
+    filter:drop-shadow(0 3px 5px rgba(2,20,30,.35));}
+  #ecm-cursor.on{opacity:1}
+  #ecm-cursor.press svg{transform:scale(.82);transform-origin:0 0}
+  #ecm-cursor svg{transition:transform .18s ease}
+  .ecm-ripple{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;
+    background:rgba(22,160,144,.30);border:2px solid rgba(22,160,144,.85);z-index:29;pointer-events:none;
+    transform:scale(.4);opacity:.9;animation:ecmRipple .55s ease-out forwards}
+  @keyframes ecmRipple{to{transform:scale(3.2);opacity:0}}
+</style>
+</head>
+<body>
+<div id="ecm-stage">
+  <iframe class="ecm-frame" data-screen="dashboard" src="screens/dashboard.html" title="eCareMD Dashboard" scrolling="no"></iframe>
+  <iframe class="ecm-frame" data-screen="patients" src="screens/patients.html" title="eCareMD Patients" scrolling="no"></iframe>
+  <iframe class="ecm-frame" data-screen="patient-detail" src="screens/patient-detail.html" title="eCareMD Patient — Cindy Russell" scrolling="no"></iframe>
+  <iframe class="ecm-frame" data-screen="questionnaire" src="screens/questionnaire.html" title="eCareMD Condition Questionnaire" scrolling="no"></iframe>
+  <iframe class="ecm-frame" data-screen="billing" src="screens/billing.html" title="eCareMD Billing &amp; Claims" scrolling="no"></iframe>
+  <iframe class="ecm-frame" data-screen="library" src="screens/library.html" title="eCareMD Library" scrolling="no"></iframe>
+
+  <div id="ecm-cursor" aria-hidden="true">
+    <svg width="26" height="26" viewBox="0 0 24 24"><path d="M5 2.5 19 12l-6.2 1.1 3.4 6.5-2.7 1.4-3.4-6.6L5 19.4Z" fill="#12303a" stroke="#fff" stroke-width="1.3" stroke-linejoin="round"/></svg>
+  </div>
+</div>
+
+<script>
+(function(){
+  var ORDER=["dashboard","patients","patient-detail","questionnaire","billing","library"];
+  var frames={}, stage=document.getElementById('ecm-stage'), cur=document.getElementById('ecm-cursor');
+  document.querySelectorAll('.ecm-frame').forEach(function(f){frames[f.dataset.screen]=f;});
+
+  function show(n, extra){
+    ORDER.forEach(function(k){
+      var f=frames[k]; if(!f) return;
+      var on=(k===n); f.classList.toggle('active', on);
+      if(on){ try{ var msg={ecmReplay:true}; if(extra){for(var p in extra)msg[p]=extra[p];} f.contentWindow.postMessage(msg,'*'); }catch(_){}}
+    });
+  }
+  function move(x,y){ cur.style.left=x+'%'; cur.style.top=y+'%'; }
+  function showCur(){ cur.classList.add('on'); }
+  function hideCur(){ cur.classList.remove('on'); }
+  function click(x,y){
+    move(x,y);
+    cur.classList.remove('press'); void cur.offsetWidth; cur.classList.add('press');
+    setTimeout(function(){ cur.classList.remove('press'); }, 200);
+    var r=document.createElement('div'); r.className='ecm-ripple';
+    r.style.left=x+'%'; r.style.top=y+'%'; stage.appendChild(r);
+    setTimeout(function(){ if(r.parentNode) r.parentNode.removeChild(r); }, 600);
+  }
+
+  /* Compute a control's centre as a % of the stage from the screen's own DOM,
+     so the cursor lands EXACTLY on the real control (same-origin on the server).
+     Falls back to approximate coords if the doc isn't reachable (e.g. file://). */
+  function docOf(n){ try{ return frames[n].contentDocument || frames[n].contentWindow.document; }catch(_){ return null; } }
+  function ptOf(n, sel, fb){
+    var d=docOf(n);
+    if(d){
+      var el=(typeof sel==='function') ? sel(d) : d.querySelector(sel);
+      if(el){ var r=el.getBoundingClientRect();
+        var sw=stage.clientWidth||window.innerWidth, sh=stage.clientHeight||window.innerHeight;
+        if((r.width||r.height) && sw && sh) return { x:(r.left+r.width/2)/sw*100, y:(r.top+r.height/2)/sh*100 };
+      }
+    }
+    return fb;
+  }
+  function navOf(text){ return function(d){ var a=d.querySelectorAll('.snav a');
+    for(var i=0;i<a.length;i++){ if(a[i].textContent.replace(/\s+/g,' ').indexOf(text)>-1) return a[i]; } return null; }; }
+  function moveTo(n, sel, fb){ var p=ptOf(n,sel,fb); if(p) move(p.x,p.y); }
+  function clickAt(n, sel, fb){ var p=ptOf(n,sel,fb); if(p) click(p.x,p.y); }
+
+  var CM  = function(d){ return d.querySelector('.mtab.on') || d.querySelector('.mtab'); };
+  var NEWB= function(d){ return d.querySelector('.sbtn.teal'); };
+  var CINDY=function(d){ var n=d.querySelectorAll('.name-txt'); for(var i=0;i<n.length;i++){ if(n[i].textContent.indexOf('Cindy')>-1) return n[i]; } return null; };
+
+  /* Guided tour: every screen change is driven by the cursor clicking the real control. */
+  var steps=[
+    { d:function(){ show('patient-detail'); hideCur(); },                                 w:2800 },  /* start */
+    { d:function(){ showCur(); moveTo('patient-detail', CM,   {x:22,y:24}); },             w:1100 },  /* -> Care Management */
+    { d:function(){ clickAt('patient-detail', CM,   {x:22,y:24}); },                       w:800  },
+    { d:function(){ moveTo('patient-detail', NEWB, {x:49,y:52}); },                        w:1100 },  /* -> New button */
+    { d:function(){ clickAt('patient-detail', NEWB, {x:49,y:52}); show('questionnaire'); hideCur(); }, w:10200 }, /* questionnaire runs its own step-tour + Next */
+    { d:function(){ show('patient-detail',{autofill:true}); showCur(); },                  w:3400 },  /* returns + auto-types */
+    { d:function(){ moveTo('patient-detail', navOf('Billing'),  {x:9,y:26}); },            w:1100 },  /* -> Billing nav */
+    { d:function(){ clickAt('patient-detail', navOf('Billing'), {x:9,y:26}); show('billing'); }, w:3600 },
+    { d:function(){ moveTo('billing', navOf('Library'),  {x:9,y:60}); },                   w:1100 },  /* -> Library nav */
+    { d:function(){ clickAt('billing', navOf('Library'), {x:9,y:60}); show('library'); },  w:3600 },
+    { d:function(){ moveTo('library', navOf('Dashboard'),  {x:9,y:13}); },                 w:1100 },  /* -> Dashboard nav */
+    { d:function(){ clickAt('library', navOf('Dashboard'), {x:9,y:13}); show('dashboard'); }, w:3800 },
+    { d:function(){ moveTo('dashboard', navOf('Patients'),  {x:9,y:19}); },                w:1100 },  /* -> Patients nav */
+    { d:function(){ clickAt('dashboard', navOf('Patients'), {x:9,y:19}); show('patients'); }, w:2600 },  /* patients worklist */
+    { d:function(){ showCur(); moveTo('patients', CINDY, {x:30,y:24}); },                  w:1200 },  /* -> Cindy Russell row */
+    { d:function(){ clickAt('patients', CINDY, {x:30,y:24}); show('patient-detail'); hideCur(); }, w:2600 }  /* opens patient, loop continues */
+  ];
+
+  var i=0, tmo=null, paused=false, idleTok=null, reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function step(){
+    if(paused) return;
+    var s=steps[i]; i=(i+1)%steps.length;
+    try{ s.d(); }catch(_){}
+    tmo=setTimeout(step, s.w);
+  }
+  function pauseTour(){ if(!paused){ paused=true; clearTimeout(tmo); hideCur(); } }
+  function resumeSoon(){ clearTimeout(idleTok); idleTok=setTimeout(function(){ if(paused && !reduceMotion){ paused=false; step(); } }, 5000); }
+
+  /* 1) stop auto-advance while the user is interacting, resume after they idle */
+  window.addEventListener('message', function(e){
+    var d=e.data||{};
+    if(d.ecmUser){ pauseTour(); resumeSoon(); }          /* trusted interaction inside a screen */
+    if(d.ecmNav && frames[d.ecmNav]){                    /* user clicked a nav item */
+      show(d.ecmNav); pauseTour(); resumeSoon();
+    }
+  });
+  /* interaction over the stage itself (gaps / cursor layer) */
+  ['pointerdown','wheel','pointermove'].forEach(function(ev){
+    stage.addEventListener(ev, function(e){ if(e.isTrusted){ pauseTour(); resumeSoon(); } }, {passive:true});
+  });
+
+  if(!reduceMotion) step();  /* start the tour (skipped for reduced-motion users) */
+})();
+</script>
+</body>
+</html>

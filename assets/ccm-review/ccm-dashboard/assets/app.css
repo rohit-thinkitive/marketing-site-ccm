@@ -1,0 +1,181 @@
+/* ============================================================
+   eCareMD — shared design system for CCM demo screens
+   Full-desktop layout: left sidebar + top header + main canvas
+   ============================================================ */
+:root{
+  --teal:#0b6645;            /* primary brand teal (buttons, active nav) */
+  --teal-strong:#0E8C7E;
+  --teal-dark:#0B7A6E;
+  --teal-soft:#E7F5F2;       /* light teal fill (chips, hover) */
+  --teal-softer:#F1F9F7;
+  --teal-border:#BFE3DC;
+
+  --ink:#2B3A42;             /* primary text - dark slate */
+  --ink-2:#465661;           /* secondary text */
+  --ink-3:#8A97A0;           /* muted text / icons */
+  --ink-4:#A9B4BC;           /* very muted */
+
+  --line:#E7EBEE;            /* card / table borders */
+  --line-soft:#EEF1F4;       /* row dividers */
+  --bg:#F5F7F9;              /* app canvas background */
+  --white:#FFFFFF;
+
+  --amber:#E5A93B;
+  --coral:#E58A6E;           /* pie "not ready" */
+  --coral-2:#E9836B;
+  --gold:#EED37A;
+  --green:#3FA776;
+  --red:#D14D42;
+  --blue:#e7f5ff;
+
+  --radius:10px;
+  --radius-sm:7px;
+  --shadow-card:0 1px 2px rgba(16,40,60,.04);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+/* body wraps the fixed 1440x918 canvas; nav.js scales it to cover the embed */
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  color:var(--ink);
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  font-size:14px;
+  line-height:1.4;
+}
+svg{display:block}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+/* ---------- App shell ---------- */
+/* fixed design canvas — matches the native screenshot size, so the whole
+   screen scales to fill any embed frame of the same aspect (see nav.js zoom) */
+.app{display:flex;width:1440px;height:918px;overflow:hidden;background:var(--bg)}
+.sidebar{
+  width:248px;flex:0 0 248px;background:#0b6645;border-right:0;
+  display:flex;flex-direction:column;padding:0;height:100%;
+}
+/* Medarch logo cell — top-left, above the sidebar, aligned with the header row */
+.side-logo{height:64px;flex:0 0 64px;display:flex;align-items:center;padding:0 18px;border-bottom:1px solid var(--line)}
+.side-logo img{height:26px;width:auto;display:block; filter: brightness(52.5);}
+.content{flex:1;min-width:0;display:flex;flex-direction:column}
+
+/* ---------- Top header ---------- */
+.topbar{
+  height:64px;background:#fff;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:18px;padding:0 22px;flex:0 0 64px;
+}
+.topbar .logo{height:30px;width:auto;flex:0 0 auto}
+.collapse-btn{
+  width:30px;height:30px;border-radius:8px;display:grid;place-items:center;
+  color:var(--teal);flex:0 0 auto;
+}
+.topnav{display:flex;align-items:center;gap:22px;flex:0 0 auto}
+.topnav a{
+  display:flex;align-items:center;gap:6px;font-size:14.5px;font-weight:600;
+  color:var(--ink-2);text-decoration:none;white-space:nowrap;
+}
+.topnav a svg{color:var(--ink-3)}
+.topnav a.on{color:var(--ink)}
+.topnav .chev{color:var(--ink-3)}
+
+.topright{margin-left:auto;display:flex;align-items:center;gap:16px;flex:0 0 auto}
+.icon-box{
+  width:40px;height:38px;border:1.5px solid var(--teal);border-radius:9px;
+  display:grid;place-items:center;color:var(--teal);
+}
+.org-select{
+  display:flex;align-items:center;gap:10px;height:40px;padding:0 12px;
+  border:1px solid #D7DDE2;border-radius:9px;min-width:210px;justify-content:space-between;
+  font-size:14px;font-weight:600;color:var(--ink);background:#fff;
+}
+.org-select .stack{display:flex;flex-direction:column;color:var(--ink-4);line-height:.5}
+.btn-admin{
+  display:flex;align-items:center;gap:8px;height:40px;padding:0 16px;
+  border:1.5px solid var(--teal);border-radius:9px;color:var(--teal);
+  font-size:14px;font-weight:600;background:#fff;
+}
+.hicon{color:var(--ink-2);display:grid;place-items:center}
+.btn-new{
+  display:flex;align-items:center;gap:8px;height:40px;padding:0 18px;
+  background:var(--teal);border-radius:9px;color:#fff;font-size:14px;font-weight:600;
+}
+
+/* ---------- Sidebar nav ---------- */
+.snav{display:flex;flex-direction:column;gap:3px;padding:12px 12px 0}
+.snav a{
+  display:flex;align-items:center;gap:13px;height:42px;padding:0 14px;border-radius:9px;
+  color:#fff;font-size:16px;font-weight:500;text-decoration:none;white-space:nowrap;
+}
+.snav a svg{color:rgba(255,255,255,.85);flex:0 0 auto}
+.snav a:hover{background:rgba(255,255,255,.12)}
+.snav a.on{background:rgba(255,255,255,.16);color:#fff;font-weight:600}
+.snav a.on svg{color:#fff}
+.side-foot{margin-top:auto;padding:16px 16px 18px}
+.side-foot .lbl{font-size:11px;font-weight:700;letter-spacing:.5px;color:rgba(255,255,255,.6);text-transform:uppercase}
+.side-foot .mail{font-size:12px;color:rgba(255,255,255,.6);margin-top:3px}
+.side-foot .logout{display:flex;align-items:center;gap:12px;margin-top:22px;color:#fff;font-size:14px;font-weight:500}
+.side-foot .logout svg{color:rgba(255,255,255,.85)}
+
+/* ---------- Main canvas ---------- */
+.main{flex:1;min-width:0;padding:22px 26px;overflow:hidden;display:flex;flex-direction:column}
+.panel{background:#fff;border:1px solid var(--line);border-radius:12px}
+/* table screens: the panel fills the canvas, footer pinned to the bottom */
+.main>.panel{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.main>.panel>.tbl-wrap{flex:1;min-height:0}
+
+/* ---------- Buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px;border-radius:8px;font-size:14px;font-weight:600;white-space:nowrap}
+.btn-teal{background:var(--teal);color:#fff}
+.btn-out{background:#fff;border:1px solid #D7DDE2;color:var(--ink-2)}
+.btn-out-teal{background:#fff;border:1.5px solid var(--teal);color:var(--teal)}
+
+/* ---------- Segmented toggle (CCM / PCM / RPM) ---------- */
+.seg{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:9px;padding:3px;gap:2px}
+.seg button{padding:6px 18px;border-radius:6px;font-size:13.5px;font-weight:600;color:var(--ink-3)}
+.seg button.on{background:var(--teal);color:#fff}
+
+/* ---------- Month pager ---------- */
+.pager{display:inline-flex;align-items:center;border:1px solid #D7DDE2;border-radius:9px;overflow:hidden;height:40px}
+.pager .m{padding:0 18px;font-size:14px;font-weight:600;color:var(--ink)}
+.pager .a{width:38px;height:100%;display:grid;place-items:center;color:var(--ink-3)}
+.pager .a:hover{background:var(--bg)}
+
+/* ---------- Dropdown box ---------- */
+.dd{display:inline-flex;align-items:center;gap:10px;height:40px;padding:0 14px;border:1px solid #D7DDE2;border-radius:9px;font-size:14px;font-weight:600;color:var(--ink);background:#fff;justify-content:space-between}
+.dd .stack{display:flex;flex-direction:column;color:var(--ink-4);line-height:.5}
+
+/* ---------- Search ---------- */
+.search{display:flex;align-items:center;gap:10px;height:40px;padding:0 14px;border:1px solid #D7DDE2;border-radius:9px;color:var(--ink-3);font-size:14px;min-width:280px}
+.search input{border:none;outline:none;font:inherit;color:var(--ink);flex:1;background:transparent}
+
+/* ---------- Tables ---------- */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{
+  text-align:left;font-size:13px;font-weight:700;color:var(--ink-2);
+  padding:13px 16px;border-bottom:1px solid var(--line);white-space:nowrap;
+}
+.tbl td{
+  font-size:13.5px;color:var(--ink);padding:11px 16px;border-bottom:1px solid var(--line-soft);
+  white-space:nowrap;vertical-align:middle;
+}
+.tbl tr:last-child td{border-bottom:none}
+.th-sort{display:inline-flex;align-items:center;gap:5px}
+.dots-h{color:var(--ink-4);letter-spacing:1px}
+.chk{width:17px;height:17px;border:1.6px solid #C4CDD4;border-radius:4px;display:inline-block;vertical-align:middle}
+
+/* condition / program chips */
+.chip{display:inline-flex;align-items:center;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;background:var(--teal-soft);color:var(--teal-strong)}
+.chip-plus{display:inline-flex;align-items:center;justify-content:center;padding:4px 8px;border-radius:6px;font-size:12px;font-weight:600;background:#EEF2F4;color:var(--ink-2)}
+.chip-prog{display:inline-flex;align-items:center;padding:4px 12px;border-radius:14px;font-size:12px;font-weight:700;background:var(--teal);color:#fff}
+.avatar{width:26px;height:26px;border-radius:50%;background:var(--teal-soft);display:inline-grid;place-items:center;color:var(--teal);flex:0 0 auto}
+.care-av{width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;flex:0 0 auto}
+
+/* pagination */
+.pgfoot{display:flex;align-items:center;justify-content:flex-end;gap:18px;padding:16px 20px;font-size:13.5px;color:var(--ink-2)}
+.rpp{display:flex;align-items:center;gap:10px}
+.rpp .box{display:inline-flex;align-items:center;gap:12px;border:1px solid #D7DDE2;border-radius:7px;padding:6px 10px;font-weight:600;color:var(--ink)}
+
+/* page title */
+.h-title{font-size:20px;font-weight:700;color:var(--ink)}
